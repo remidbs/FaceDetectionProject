@@ -84,7 +84,7 @@ int detectFace(Mat A, bool verbose, bool displayNormalizedImage,
     Mat B(width, height, CV_32F);
     for (int i = 0; i < width; i++)
         for (int j = 0; j < height; j++) {
-            B.at<float>(i, j) = (((double) A.at<uchar>(i, j) - avg) / (2 * sigma));
+            B.at<float>(i, j) = (((double) A.at<uchar>(i, j) - avg) / (width*height*sigma));
         }
     if (displayNormalizedImage) {
         imshow("I", B);
