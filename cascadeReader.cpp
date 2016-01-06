@@ -7,11 +7,11 @@ using namespace cv;
 using namespace std;
 
 
-int detectFace(string filename, bool verbose = false, bool displayNormalizedImage = false,
-               bool displayFeatures = false, bool displayOCVResult = false);
+int detectFace(string filename, bool verbose = false,
+               bool displayFeatures = false);
 
-int detectFace(Mat I, bool verbose = false, bool displayNormalizedImage = false,
-               bool displayFeatures = false, bool displayOCVResult = false);
+int detectFace(Mat I, bool verbose = false,
+               bool displayFeatures = false);
 
 int detectBestFace(string filename);
 
@@ -55,41 +55,23 @@ int detectBestFace(string filename) {
     return bestStageReached;
 }
 
-int detectFace(string filename, bool verbose, bool displayNormalizedImage,
-               bool displayFeatures, bool displayOCVResult) {
+int detectFace(string filename, bool verbose,
+               bool displayFeatures) {
     string path = "../pics/" + filename + ".jpeg";
     Mat I = imread(path);
     Mat A;
     cvtColor(I, A, CV_BGR2GRAY);
-    return detectFace(A, verbose, displayNormalizedImage, displayFeatures, displayOCVResult);
+    return detectFace(A, verbose, displayFeatures);
 }
 
-int detectFace(Mat A, bool verbose, bool displayNormalizedImage,
-               bool displayFeatures, bool displayOCVResult) {
+int detectFace(Mat A, bool verbose,
+               bool displayFeatures) {
     int width = A.cols;
     int height = A.rows;
-    int sum = 0;
-    int squareSum = 0;
-    for (int i = 0; i < width; i++)
-        for (int j = 0; j < height; j++) {
-            int a = (int) A.at<uchar>(j, i);
-            sum += a;
-            squareSum += a * a;
-        }
-    double avg = (double) sum / (double) (height * width);
-    double squareAvg = (double) squareSum / (double) (height * width);
-    double sigma = sqrt(squareAvg - avg * avg);
-    if (verbose)
-        cout << avg << "\t" << sigma << endl;
+
     Mat B(width, height, CV_32F);
-    for (int i = 0; i < width; i++)
-        for (int j = 0; j < height; j++) {
-            B.at<float>(i, j) = (((double) A.at<uchar>(i, j) - avg) / (width*height*sigma));
-        }
-    if (displayNormalizedImage) {
-        imshow("I", B);
-        waitKey();
-    }
+    B = normalizeImage(A);
+
     string filename2 = "../haarcascade_frontalface_default.xml";
     FileStorage fs;
     fs.open(filename2, FileStorage::READ);
@@ -170,7 +152,7 @@ int detectFace(Mat A, bool verbose, bool displayNormalizedImage,
             if (verbose)
                 cout << "\t\t\tfeatureValue = " << haarSum << "; threshold : " << threshold << endl;
         }
-        if(verbose)
+        if (verbose)
             cout << "stageSum = " << stageSum << "; stageThreshold = " << stageThreshold << endl;
         if (stageSum < stageThreshold) {
             isAFace = false;
@@ -178,7 +160,7 @@ int detectFace(Mat A, bool verbose, bool displayNormalizedImage,
         }
     }
 
-    if(verbose) {
+    if (verbose) {
         cout << "My version : ";
         if (isAFace)
             cout << "this is a face!" << endl;
@@ -216,11 +198,9 @@ void opencvDetect(string filename) {
     for (size_t i = 0; i < faces.size(); i++) {
         cout << faces[i];
         Point center(faces[i].x + faces[i].width * 0.5, faces[i].y + faces[i].height * 0.5);
-        ellipse(frame, center, Size(faces[i].width * 0.5, faces[i].height * 0.5), 0, 0, 360, Scalar(255, 0, 255), 4, 8,
-                0);
         rectangle(frame, faces[i], Scalar(255, 0, 0), 4, 8, 0);
     }
-    //-- Show what you got
+
     imshow(window_name, frame);
     waitKey();
 

@@ -153,38 +153,15 @@ public :
     }
     double eval(Mat& II){
         switch (type){
-            case 0: return(edgeV(x,y,w,h,II)); break;
-            case 1: return(edgeH(x,y,w,h,II)); break;
-            case 2: return(lineV(x,y,w,h,II)); break;
-            case 3: return(lineH(x,y,w,h,II)); break;
+            case 0: return(edgeV(x,y,w,h,II));
+            case 1: return(edgeH(x,y,w,h,II));
+            case 2: return(lineV(x,y,w,h,II));
+            case 3: return(lineH(x,y,w,h,II));
             default: return(block(x,y,w,h,II));
         }
     }
 
 };
-
-void integralImage(Mat& original, Mat& II){
-
-    int width=original.cols;
-    int height=original.rows;
-
-    Mat S(width, height, CV_32F);
-
-    for(int y=0;y<width;y++){
-        for(int x=0;x<height;x++){
-
-            if(y==0)
-                S.at<float>(y,x)=0;
-            else
-                S.at<float>(y,x)=S.at<float>(y-1,x)+(float)(original.at<uchar>(y,x));
-
-            if(x==0)
-                II.at<float>(y,x)=0;
-            else
-                II.at<float>(y,x)=II.at<float>(y,x-1)+S.at<float>(y,x);
-        }
-    }
-}
 
 map<int, feature> featuresIndex(int width, int height) {
     int f = 0;
