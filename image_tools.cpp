@@ -52,7 +52,7 @@ void integralImage(Mat &original, Mat &II) {
 }
 
 Mat getIntegralImageFromFilename(string filename) {
-    Mat I = imread("../pics/" + filename + ".jpeg");
+    Mat I = imread("../pics/output/" + filename + ".jpeg");
     Mat I2;
     cvtColor(I, I2, CV_BGR2GRAY);
     Mat I3(I2.cols, I2.rows, CV_32F);

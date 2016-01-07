@@ -162,14 +162,14 @@ int detectFace(Mat A, bool verbose,
     return numStage;
 }
 
-void opencvDetect(string filename) {
-    string path = "../pics/" + filename + ".jpeg";
+Mat opencvDetect(string filename) {
+    string path = filename;
     string face_cascade_name = "../haarcascade_frontalface_default.xml";
     CascadeClassifier face_cascade;
     string window_name = "Capture - Face detection";
     if (!face_cascade.load(face_cascade_name)) {
         printf("--(!)Error loading\n");
-        return;
+        throw std::logic_error("File not found");
     };
 
     Mat frame = imread(path);
@@ -183,15 +183,21 @@ void opencvDetect(string filename) {
     //-- Detect faces
     face_cascade.detectMultiScale(frame_gray, faces, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(30, 30));
     cout << "OpenCV version : ";
-    if (faces.size() > 0)
+    if (faces.size() > 0){
+        Mat Res;
+        frame(faces[0]).copyTo(Res);
         cout << "there is at least one face on the picture..." << endl;
-    else
+        return Res;
+    }else
         cout << "no face on this picture" << endl;
     for (size_t i = 0; i < faces.size(); i++) {
         cout << faces[i];
         Point center(faces[i].x + faces[i].width * 0.5, faces[i].y + faces[i].height * 0.5);
         rectangle(frame, faces[i], Scalar(255, 0, 0), 4, 8, 0);
     }
+
+    throw std::logic_error("No face !");
+
 
     imshow(window_name, frame);
     waitKey();

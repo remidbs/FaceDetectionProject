@@ -12,7 +12,7 @@ int detectFace(cv::Mat I, bool verbose = false, bool displayFeatures = false);
 
 int detectBestFace(std::string filename);
 
-void opencvDetect(std::string filename);
+cv::Mat opencvDetect(std::string filename);
 
 int detectBestFace(std::string filename);
 

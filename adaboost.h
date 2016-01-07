@@ -5,7 +5,6 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include "features.h"
-#include "image_tools.h"
 
 
 class AdaBoost {
@@ -21,16 +20,21 @@ private:
     std::vector<cv::Mat> positiveSet;
     std::vector<cv::Mat> negativeSet;
     unsigned long datasetSize;
+    unsigned long positiveDatasetSize;
+    unsigned long negativeDatasetSize;
     std::vector<feature> features;
     std::vector<std::vector<double> > coef;
     std::vector<double> sums;
     std::vector<std::pair<int, double> > classifiers;
     std::vector<double> betas;
+    std::vector<std::vector<double> > featureValues;
 
     double errorWeakClassifier(double threshold, int polarisation, int step, int featureNumber);
 
     int weakClassifier(double threshold, int polarisation, double x);
 };
+
+void printClassifier(double threshold, int polarisation);
 
 
 #endif //FACEDET_ADABOOST_H_H

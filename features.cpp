@@ -1,9 +1,5 @@
 #include <iostream>
-#include <map>
-#include <vector>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/objdetect/objdetect.hpp>
 
 #include "features.h"
 
@@ -52,7 +48,7 @@ void feature::print() {
     cout << endl;
 }
 
-double feature::edgeV(int x, int y, int w, int h, Mat &II) {
+double feature::edgeV(int x, int y, int w, int h, const Mat &II) {
     assert(w % 2 == 0);
     assert((x + w < II.cols) && (y + h < II.rows));
 
@@ -71,7 +67,7 @@ double feature::edgeV(int x, int y, int w, int h, Mat &II) {
     return (a - 2 * b + c - d + 2 * e - f);
 }
 
-double feature::edgeH(int x, int y, int w, int h, Mat &II) {
+double feature::edgeH(int x, int y, int w, int h, const Mat &II) {
     assert(h % 2 == 0);
     assert((x + w < II.cols) && (y + h < II.rows));
 
@@ -91,7 +87,7 @@ double feature::edgeH(int x, int y, int w, int h, Mat &II) {
     return (a - b - 2 * c + 2 * d + e - f);
 }
 
-double feature::lineV(int x, int y, int w, int h, Mat &II) {
+double feature::lineV(int x, int y, int w, int h, const Mat &II) {
     assert(w % 3 == 0);
     assert((x + w < II.cols) && (y + h < II.rows));
 
@@ -111,7 +107,7 @@ double feature::lineV(int x, int y, int w, int h, Mat &II) {
     return (a - 2 * b + 2 * c - d - e + 2 * f - 2 * g + H);
 }
 
-double feature::lineH(int x, int y, int w, int h, Mat &II) {
+double feature::lineH(int x, int y, int w, int h, const Mat &II) {
     assert(h % 3 == 0);
     assert((x + w < II.cols) && (y + h < II.rows));
 
@@ -135,7 +131,7 @@ double feature::lineH(int x, int y, int w, int h, Mat &II) {
     return (a - b - 2 * c + 2 * d + 2 * e - 2 * f - g + H);
 }
 
-double feature::block(int x, int y, int w, int h, Mat &II) {
+double feature::block(int x, int y, int w, int h, const Mat &II) {
     assert(w % 2 == 0);
     assert(h % 2 == 0);
     assert((x + w < II.cols) && (y + h < II.rows));
@@ -160,24 +156,24 @@ double feature::block(int x, int y, int w, int h, Mat &II) {
     return (a - 2 * b + c - 2 * d + 4 * e - 2 * f + g - 2 * H + i);
 }
 
-double feature::eval(Mat &II) {
+const double feature::eval(const Mat &II) {
     int width = II.cols;
     int height = II.rows;
-//    int x = (width * x) / 24;
-//    int y = (height * y) / 24;
-//    int w = (width * w) / 24;
-//    int h = (height * h) / 24;
+    int xx = (width * x) / 24;
+    int yy = (height * y) / 24;
+    int ww = (width * w) / 24;
+    int hh = (height * h) / 24;
     switch (type) {
         case 0:
-            return (edgeV(x, y, w, h, II));
+            return (edgeV(xx, yy, ww - (ww % 2), hh, II));
         case 1:
-            return (edgeH(x, y, w, h, II));
+            return (edgeH(xx, yy, ww, hh - (hh % 2), II));
         case 2:
-            return (lineV(x, y, w, h, II));
+            return (lineV(xx, yy, ww - (ww % 3), hh, II));
         case 3:
-            return (lineH(x, y, w, h, II));
+            return (lineH(xx, yy, ww, hh - (hh % 3), II));
         default:
-            return (block(x, y, w, h, II));
+            return (block(xx, yy, ww - (ww % 2), hh - (hh % 2), II));
     }
 }
 
@@ -186,8 +182,8 @@ vector<feature> featuresIndex(int width, int height) {
     //edgeVertical
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
-            for (int w = 0; w < width - x; w = w + 2) {
-                for (int h = 0; h < height - y; h++) {
+            for (int w = 2; w < width - x; w = w + 2) {
+                for (int h = 1; h < height - y; h++) {
                     index.push_back(feature(0, x, y, w, h));
                 }
             }
@@ -197,8 +193,8 @@ vector<feature> featuresIndex(int width, int height) {
     //edgeHorizontal
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
-            for (int w = 0; w < width - x; w++) {
-                for (int h = 0; h < height - y; h = h + 2) {
+            for (int w = 1; w < width - x; w++) {
+                for (int h = 2; h < height - y; h = h + 2) {
                     index.push_back(feature(1, x, y, w, h));
                 }
             }
@@ -207,8 +203,8 @@ vector<feature> featuresIndex(int width, int height) {
     //lineVertical
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
-            for (int w = 0; w < width - x; w = w + 3) {
-                for (int h = 0; h < height - y; h++) {
+            for (int w = 3; w < width - x; w = w + 3) {
+                for (int h = 1; h < height - y; h++) {
                     index.push_back(feature(2, x, y, w, h));
                 }
             }
@@ -217,8 +213,8 @@ vector<feature> featuresIndex(int width, int height) {
     //lineHorizontal
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
-            for (int w = 0; w < width - x; w++) {
-                for (int h = 0; h < height - y; h = h + 3) {
+            for (int w = 1; w < width - x; w++) {
+                for (int h = 3; h < height - y; h = h + 3) {
                     index.push_back(feature(3, x, y, w, h));
                 }
             }
@@ -227,8 +223,8 @@ vector<feature> featuresIndex(int width, int height) {
     //block
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
-            for (int w = 0; w < width - x; w = w + 2) {
-                for (int h = 0; h < height - y; h = h + 2) {
+            for (int w = 2; w < width - x; w = w + 2) {
+                for (int h = 2; h < height - y; h = h + 2) {
                     index.push_back(feature(4, x, y, w, h));
                 }
             }
@@ -236,3 +232,12 @@ vector<feature> featuresIndex(int width, int height) {
     }
     return index;
 }
+
+vector<double> evaluateFeatures(vector<feature> &features, const Mat &II) {
+    vector<double> res;
+    for (int i = 0; i < features.size(); i++) {
+        res.push_back(features[i].eval(II));
+    }
+    return res;
+}
+
