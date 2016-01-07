@@ -3,19 +3,11 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
 
-using namespace cv;
+#include "cascadeReader.h"
+#include "image_tools.h"
+
 using namespace std;
-
-
-int detectFace(string filename, bool verbose = false,
-               bool displayFeatures = false);
-
-int detectFace(Mat I, bool verbose = false,
-               bool displayFeatures = false);
-
-int detectBestFace(string filename);
-
-void opencvDetect(string filename);
+using namespace cv;
 
 int detectBestFace(string filename) {
     string path = "../pics/" + filename + ".jpeg";

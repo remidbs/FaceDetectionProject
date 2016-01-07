@@ -1,5 +1,9 @@
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
+#include "image_tools.h"
+
+using namespace std;
 using namespace cv;
 
 Mat normalizeImage(const Mat &A) {
@@ -45,4 +49,15 @@ void integralImage(Mat &original, Mat &II) {
                 II.at<float>(y, x) = II.at<float>(y, x - 1) + S.at<float>(y, x);
         }
     }
+}
+
+Mat getIntegralImageFromFilename(string filename) {
+    Mat I = imread("../pics/" + filename + ".jpeg");
+    Mat I2;
+    cvtColor(I, I2, CV_BGR2GRAY);
+    Mat I3(I2.cols, I2.rows, CV_32F);
+    I3 = normalizeImage(I2);
+    Mat I4(I2.cols, I2.rows, CV_32F);
+    integralImage(I3, I4);
+    return I4;
 }
