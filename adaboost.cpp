@@ -106,7 +106,7 @@ void AdaBoost::train(const int steps, bool verbose) {
                 (i >= positiveSet.size()
                  && weakClassifier(thresholdOptAmongFeatures, polarisationOptAmongFeatures,
                                    features[optFeatureNb].eval(negativeSet[i - positiveSet.size()])) == 0)) {
-                coef[step][i] *= betas[step];
+                coef[step][i] *= betas[step-1];
             }
             sums[step] += coef[step][i];
         }

@@ -56,7 +56,7 @@ int main() {
 
     AdaBoost adaBoost(positives, negatives);
 
-    adaBoost.train(10,true);
+    adaBoost.train(2,true);
 
     adaBoost.print();
 
