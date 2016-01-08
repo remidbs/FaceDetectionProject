@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 
 #include "adaboost.h"
 #include "image_tools.h"
@@ -8,6 +9,7 @@ using namespace std;
 using namespace cv;
 
 AdaBoost::AdaBoost(vector<string> positiveFilenames, vector<string> negativeFilenames) {
+    outputfile.open("../output");
     features = featuresIndex(24, 24);
     datasetSize = positiveFilenames.size() + negativeFilenames.size();
     positiveDatasetSize = positiveFilenames.size();
@@ -45,7 +47,7 @@ void AdaBoost::train(const int steps, bool verbose) {
         for (int featureNumber = 0; featureNumber < features.size(); featureNumber++) {
             if (verbose) {
 //                features[featureNumber].print();
-                if(featureNumber % (features.size() / 100) == 0){
+                if (featureNumber % (features.size() / 100) == 0) {
                     cout << featureNumber << "/" << features.size() << endl;
                 }
             }
@@ -87,6 +89,9 @@ void AdaBoost::train(const int steps, bool verbose) {
             }
         }
         cout << "---end-- minimal error :" << errorMinAmongFeatures << endl << endl;
+
+        outputfile << features[optFeatureNb].getString() << " " << polarisationOptAmongFeatures << " " <<
+        thresholdOptAmongFeatures << endl;
 
         classifiers.push_back(pair<int, double>(polarisationOptAmongFeatures, thresholdOptAmongFeatures));
         betas.push_back(errorMinAmongFeatures / (1 - errorMinAmongFeatures));

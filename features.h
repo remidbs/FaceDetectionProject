@@ -31,6 +31,7 @@ public :
 
     const double eval(const cv::Mat &II);
 
+    std::string getString();
 };
 
 std::vector<feature> featuresIndex(int width = 24, int height = 24);

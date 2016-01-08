@@ -47,7 +47,7 @@ int main() {
 //
     vector<string> positives;
     vector<string> negatives;
-    for (int i = 0; i < 244; i++) {
+    for (int i = 0; i < 120; i++) {
         negatives.push_back("negative" + to_string(i));
     }
     for (int i = 0; i < 121; i++) {
@@ -56,7 +56,7 @@ int main() {
 
     AdaBoost adaBoost(positives, negatives);
 
-    adaBoost.train(1,true);
+    adaBoost.train(10,true);
 
     adaBoost.print();
 

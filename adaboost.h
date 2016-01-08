@@ -3,6 +3,7 @@
 
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <fstream>
 
 #include "features.h"
 
@@ -28,6 +29,7 @@ private:
     std::vector<std::pair<int, double> > classifiers;
     std::vector<double> betas;
     std::vector<std::vector<double> > featureValues;
+    std::ofstream outputfile;
 
     double errorWeakClassifier(double threshold, int polarisation, int step, int featureNumber);
 

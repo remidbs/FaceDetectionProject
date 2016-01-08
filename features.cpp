@@ -241,3 +241,6 @@ vector<double> evaluateFeatures(vector<feature> &features, const Mat &II) {
     return res;
 }
 
+std::string feature::getString() {
+    return to_string(type) + " " + to_string(x) + " " + to_string(y) + " " + to_string(w) + " " + to_string(h);
+}
