@@ -4,6 +4,8 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+/*Ces fonctions ont pour but de gérer les opérations sur les images.*/
+
 cv::Mat normalizeImage(const cv::Mat &A);
 
 void integralImage(cv::Mat &original, cv::Mat &II);
