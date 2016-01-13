@@ -17,40 +17,33 @@ int detectBestFace(string filename) {
     int bestStageReached = -1;
     Rect bestWindow;
     int minSideSize = min(I2.cols, I2.rows);
-    for (int i = 38; i < minSideSize; i += 1) {
-        cout << i << endl;
-        for (int shiftX = 0; shiftX < I2.cols - i; shiftX += 1) {
-            for (int shiftY = 0; shiftY < I2.rows - i; shiftY += 1) {
-                Mat underI(i, i, I2.type());
-                for (int j = 0; j < i; j++) {
-                    for (int k = 0; k < i; k++) {
-                        underI.at<uchar>(k, j) = I2.at<uchar>(k + shiftY, j + shiftX);
-                    }
-                }
+    for (int i = 80; i < minSideSize; i += 4) {
+        cout << "Searching for face of size " << i << endl;
+        for (int shiftX = 0; shiftX < I2.cols - i; shiftX += 4) {
+            for (int shiftY = 0; shiftY < I2.rows - i; shiftY += 4) {
+                Rect window(shiftX, shiftY, i, i);
+//                Mat underI(i, i, CV_8U);
+//                I2(window).copyTo(underI);
+                Mat underI = I2(window);
                 int det = detectFace(underI);
-                cout << det << " " << Rect(shiftX, shiftY, i, i) << endl;
                 if (det >= bestStageReached) {
                     bestStageReached = det;
-                    bestWindow = Rect(shiftX, shiftY, i, i);
-//                    Mat I3;
-//                    cvtColor(I, I3, CV_BGR2GRAY);
-//                    rectangle(I3, bestWindow, Scalar(255, 0, 0), 4, 8, 0);
-//                    imshow(" ", I3);
-//            waitKey();
+                    bestWindow = window;
+                    if (bestStageReached == 24)
+                        break;
                 }
             }
-//            cout << "\t" << bestStageReached << " " << bestWindow << endl;
         }
     }
-    cout << "Best window reached stage " << bestStageReached << endl;
-//    waitKey();
+    rectangle(I2, bestWindow, Scalar(255, 0, 0), 4, 8, 0);
+    imshow("Best face found", I2);
+    waitKey();
     return bestStageReached;
 }
 
 int detectFace(string filename, bool verbose,
                bool displayFeatures) {
-    string path = "../pics/" + filename + ".jpeg";
-    Mat I = imread(path);
+    Mat I = imread(filename);
     Mat A;
     cvtColor(I, A, CV_BGR2GRAY);
     return detectFace(A, verbose, displayFeatures);
@@ -153,11 +146,10 @@ int detectFace(Mat A, bool verbose,
     }
 
     if (verbose) {
-        cout << "My version : ";
         if (isAFace)
-            cout << "this is a face!" << endl;
+            cout << "This is a face!" << endl;
         else
-            cout << "this is not a face. Discarded at stage " << numStage << endl;
+            cout << "This is not a face. Discarded at stage " << numStage << endl;
     }
     return numStage;
 }
@@ -183,12 +175,12 @@ Mat opencvDetect(string filename) {
     //-- Detect faces
     face_cascade.detectMultiScale(frame_gray, faces, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(30, 30));
     cout << "OpenCV version : ";
-    if (faces.size() > 0){
+    if (faces.size() > 0) {
         Mat Res;
         frame(faces[0]).copyTo(Res);
         cout << "there is at least one face on the picture..." << endl;
         return Res;
-    }else
+    } else
         cout << "no face on this picture" << endl;
     for (size_t i = 0; i < faces.size(); i++) {
         cout << faces[i];
