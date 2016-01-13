@@ -10,7 +10,7 @@
 
 class AdaBoost {
 public:
-    AdaBoost(std::vector<std::string> positiveFilenames, std::vector<std::string> negativeFilenames);
+    AdaBoost();
 
     void train(const int steps = 10, bool verbose = false);
 

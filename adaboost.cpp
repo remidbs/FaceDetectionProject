@@ -8,8 +8,16 @@
 using namespace std;
 using namespace cv;
 
-AdaBoost::AdaBoost(vector<string> positiveFilenames, vector<string> negativeFilenames) {
+AdaBoost::AdaBoost() {
     outputfile.open("../output");
+    vector<string> positiveFilenames;
+    vector<string> negativeFilenames;
+    for (int i = 1; i <= 106; i++) {
+        positiveFilenames.push_back("../pics/training_set/positive" + to_string(i) + ".jpeg");
+    }
+    for (int i = 0; i < 8; i++) {
+        negativeFilenames.push_back("../pics/training_set/negative" + to_string(i) + ".jpeg");
+    }
     features = featuresIndex(24, 24);
     datasetSize = positiveFilenames.size() + negativeFilenames.size();
     positiveDatasetSize = positiveFilenames.size();
@@ -17,7 +25,8 @@ AdaBoost::AdaBoost(vector<string> positiveFilenames, vector<string> negativeFile
     coef.push_back(vector<double>());
     for (int i = 0; i < positiveDatasetSize; i++) {
         coef[0].push_back(1. / positiveDatasetSize / 2.);
-        positiveSet.push_back(getIntegralImageFromFilename(positiveFilenames[i]));
+        Mat I = getIntegralImageFromFilename(positiveFilenames[i]);
+        positiveSet.push_back(I);
         featureValues.push_back(evaluateFeatures(features, positiveSet[i]));
     }
     for (int i = 0; i < negativeDatasetSize; i++) {
@@ -46,9 +55,8 @@ void AdaBoost::train(const int steps, bool verbose) {
         int optFeatureNb = -1;
         for (int featureNumber = 0; featureNumber < features.size(); featureNumber++) {
             if (verbose) {
-//                features[featureNumber].print();
-                if (featureNumber % (features.size() / 100) == 0) {
-                    cout << featureNumber << "/" << features.size() << endl;
+                if (featureNumber % (features.size() / 20) == 0) {
+                    cout << "\t" << featureNumber * 100 / features.size() << "%" << endl;
                 }
             }
             int polarisationOpt = -1;
@@ -72,25 +80,23 @@ void AdaBoost::train(const int steps, bool verbose) {
                     }
                 }
             }
-//            if (verbose) {
-//                cout << "For this feature, optimal classifier is ";
-//                printClassifier(thresholdOpt, polarisationOpt);
-//                cout << "with error " << errorMin << endl;
-//            }
             if (errorMinAmongFeatures > errorMin) {
                 errorMinAmongFeatures = errorMin;
                 polarisationOptAmongFeatures = polarisationOpt;
                 thresholdOptAmongFeatures = thresholdOpt;
                 optFeatureNb = featureNumber;
-                cout << "errorMinAmongFeatures : " << errorMinAmongFeatures << " ";
+                cout << "\terrorMinAmongFeatures : " << errorMinAmongFeatures << " ";
                 printClassifier(thresholdOptAmongFeatures, polarisationOptAmongFeatures);
                 cout << endl;
+                cout << "\t";
                 features[optFeatureNb].print();
             }
         }
+        cout << "100%" << endl;
         cout << "---end-- minimal error :" << errorMinAmongFeatures << endl << endl;
 
-        outputfile << features[optFeatureNb].getString() << " " << polarisationOptAmongFeatures << " " <<
+        outputfile << errorMinAmongFeatures << " " << features[optFeatureNb].getString() << " " <<
+        polarisationOptAmongFeatures << " " <<
         thresholdOptAmongFeatures << endl;
 
         classifiers.push_back(pair<int, double>(polarisationOptAmongFeatures, thresholdOptAmongFeatures));
@@ -106,7 +112,7 @@ void AdaBoost::train(const int steps, bool verbose) {
                 (i >= positiveSet.size()
                  && weakClassifier(thresholdOptAmongFeatures, polarisationOptAmongFeatures,
                                    features[optFeatureNb].eval(negativeSet[i - positiveSet.size()])) == 0)) {
-                coef[step][i] *= betas[step-1];
+                coef[step][i] *= betas[step - 1];
             }
             sums[step] += coef[step][i];
         }
@@ -122,7 +128,6 @@ void AdaBoost::print() {
 }
 
 double AdaBoost::errorWeakClassifier(double threshold, int polarisation, int step, int featureNumber) {
-//    cout << "Classifier with threshold: " << threshold << " and polarisation: " << polarisation << endl;
     double error = 0;
     for (int j = 0; j < datasetSize; j++) {
         if (j < positiveSet.size())

@@ -8,6 +8,7 @@ using namespace std;
 #include "image_tools.h"
 #include "adaboost.h"
 #include "cascadeReader.h"
+#include "adaboost_detector.h"
 
 int main() {
 //    vector<pair<string, int> > res;
@@ -44,29 +45,69 @@ int main() {
 //    for (int i = 0; i < M.size(); i++) {
 //        cout << M[i].eval(I4) << endl;
 //    }
+
+
+    //--To run the training step, uncomment next lines---
+//    AdaBoost adaBoost;
 //
-    vector<string> positives;
-    vector<string> negatives;
-    for (int i = 0; i < 120; i++) {
-        negatives.push_back("negative" + to_string(i));
+//    adaBoost.train(15, true);
+//
+//    adaBoost.print();
+
+    //--To run detector step for the previously trained classifier
+    AdaboostDetector detector;
+    int truePositive = 0;
+    int trueNegative = 0;
+    int falsePositive = 0;
+    int falseNegative = 0;
+    for (int i = 0; i < 9; i++) {
+        if (detector.detectFace("../pics/validation_set/positive" + to_string(i) + ".jpeg"))
+            truePositive++;
+        else
+            falseNegative++;
     }
-    for (int i = 0; i < 121; i++) {
-        positives.push_back("positive" + to_string(i));
+    for (int i = 0; i < 6; i++) {
+        if (detector.detectFace("../pics/validation_set/negative" + to_string(i) + ".jpeg"))
+            falsePositive++;
+        else
+            trueNegative++;
     }
+    cout << "Confusion matrix" << endl;
+    cout << "\tT\tF" << endl;
+    cout << "P\t" << truePositive << "\t" << falsePositive << endl;
+    cout << "N\t" << trueNegative << "\t" << falseNegative << endl;
 
-    AdaBoost adaBoost(positives, negatives);
 
-    adaBoost.train(2,true);
+    //--To run the face detector, uncomment next lines---
 
-    adaBoost.print();
+//    int res = detectFace("../pics/man224.jpeg");
+//    if(res == 24){
+//        cout << "This picture is a face" << endl;
+//    } else{
+//        cout << "This picture is not a face" << endl;
+//    }
+//    detectBestFace("baseface_woman_small");
 
-//    int count = 0;
-//    for (int i = 0; i < 245; i++) {
-//            Mat image(80, 80, CV_8U);
-//            for (int x = 0; x < 80; x++)
-//                for (int y = 0; y < 80; y++)
-//                    image.at<uchar>(x, y) = rand() % 256;
-//            imwrite("../pics/output/negative" + to_string(count) + ".jpeg", image);
-//            count++;
+    truePositive = 0;
+    trueNegative = 0;
+    falsePositive = 0;
+    falseNegative = 0;
+    for (int i = 1; i < 115; i++) {
+        if (detectFace("../pics/training_set/positive" + to_string(i) + ".jpeg") == 24 )
+            truePositive++;
+        else
+            falseNegative++;
+    }
+    for (int i = 0; i < 14; i++) {
+        if (detectFace("../pics/training_set/negative" + to_string(i) + ".jpeg") == 24)
+            falsePositive++;
+        else
+            trueNegative++;
+    }
+    cout << "Confusion matrix" << endl;
+    cout << "\tT\tF" << endl;
+    cout << "P\t" << truePositive << "\t" << falsePositive << endl;
+    cout << "N\t" << trueNegative << "\t" << falseNegative << endl;
+
     return 0;
 }

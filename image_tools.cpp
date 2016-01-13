@@ -1,5 +1,6 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <iostream>
 
 #include "image_tools.h"
 
@@ -52,7 +53,7 @@ void integralImage(Mat &original, Mat &II) {
 }
 
 Mat getIntegralImageFromFilename(string filename) {
-    Mat I = imread("../pics/output/" + filename + ".jpeg");
+    Mat I = imread(filename);
     Mat I2;
     cvtColor(I, I2, CV_BGR2GRAY);
     Mat I3(I2.cols, I2.rows, CV_32F);
