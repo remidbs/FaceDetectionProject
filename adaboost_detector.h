@@ -4,6 +4,7 @@
 #include <string>
 #include "features.h"
 
+//Classe représentant un classifieur
 class Classifier{
 private:
     int polarisation;
@@ -11,13 +12,13 @@ private:
 
 public:
     Classifier(int pol, double thresh);
-    int getLabel(double val);
+    int getLabel(double val);//renvoie le label associé à une valeur, à savoir l'image par la fonction marche d'un double
 };
 
 class AdaboostDetector {
 public:
     bool detectFace(std::string filename);
-    AdaboostDetector();
+    AdaboostDetector();//construit le classifieur robuste à partir des classifieurs faibles, features et coefficients situés dans le fichier écrit par la classe AdaBoost
 
 private:
     std::vector<Classifier> classifiers;

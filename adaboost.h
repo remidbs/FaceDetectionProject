@@ -10,7 +10,7 @@
 
 class AdaBoost {
 public:
-    AdaBoost();
+    AdaBoost();//initialise les champs, génère les features, calcules les images intégrales normalisées associées au images test
 
     void train(const int steps = 10, bool verbose = false);
 
@@ -25,11 +25,11 @@ private:
     unsigned long negativeDatasetSize;
     std::vector<feature> features;
     std::vector<std::vector<double> > coef;
-    std::vector<double> sums;
-    std::vector<std::pair<int, double> > classifiers;
-    std::vector<double> betas;
-    std::vector<std::vector<double> > featureValues;
-    std::ofstream outputfile;
+    std::vector<double> sums;//somme des coefficients utilisées à chaque étape pour renormaliser les coefficients et avoir une distribution de probabilité
+    std::vector<std::pair<int, double> > classifiers;//classifieurs trouvés à chaque étape
+    std::vector<double> betas;//valeurs permettant d'actualiser les coefficients
+    std::vector<std::vector<double> > featureValues;//valeur des features pour chaque image
+    std::ofstream outputfile;//fichier de sortie, où écrire les classifieurs
 
     double errorWeakClassifier(double threshold, int polarisation, int step, int featureNumber);
 
